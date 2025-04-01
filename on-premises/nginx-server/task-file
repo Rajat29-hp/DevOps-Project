@@ -1,0 +1,32 @@
+yum install nginx -y
+cd /etc/nginx/
+mkdir sites-available         # --[pre-configured] -ubuntu
+mkdir sites-enabled           # --[pre-configured]-ubuntu
+  
+vim nginx.conf
+############################
+upstream vproapp{
+	server tomcat.example.com:8080;
+}
+server {
+	listen 80;
+	location /
+	{
+	proxy_pass http://vproapp;
+	
+	}
+ }
+###############################
+
+systemctl restart nginx.service 
+systemctl status nginx.service 
+vim sites-available/vproapp
+
+ln -s /etc/nginx/sites-available/vproapp /etc/nginx/sites-enabled/vproapp
+systemctl restart ngix
+systemctl status nginx
+
+firewall-cmd --permanent --add-port=80/tcp
+firewall-cmd --reload
+
+# opne google >> ip:80 -------> able to see the tomcat application over the browser
