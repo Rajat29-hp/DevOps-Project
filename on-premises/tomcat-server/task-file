@@ -1,0 +1,91 @@
+sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm  >>for epel repository 
+
+yum install java-11-openjdk java-11-openjdk-devel -y
+
+# open google >> https://archive.apache.org/dist/tomcat/tomcat-9/  -- for tomcat application installation 
+wget https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.75/bin/apache-tomcat-9.0.75.tar.gz
+
+tar -xvf apache-tomcat-9.0.75.tar.gz 
+
+useradd --home-dir /usr/local/tomcat --shell /sbin/nologin tomcat
+cp -r apache-tomcat-9.0.75/* /usr/local/tomcat/
+chown -R tomcat.tomcat /usr/local/tomcat/
+
+vim /etc/systemd/system/tomcat.service
+
+##############################
+[Unit]
+Description=Apache Tomcat Web App Container
+Wants=network.target
+After=network.target
+[Service]
+Type=forking
+Environment=CATALINA_PID=/usr/local/tomcat/temp/tomcat.pid
+Environment=CATALINA_HOME=/usr/local/tomcat
+Environment='CATALINA_OPTS=-Xms512M -Xmx1G -Djava.net.preferIPv4Stack=true'
+ExecStart=/usr/local/tomcat/bin/startup.sh
+ExecStop=/usr/local/tomcat/bin/shutdown.sh
+User=tomcat
+Group=tomcat
+WorkingDirectory=/usr/local/tomcat
+[Install]
+WantedBy=multi-user.target
+##############################
+
+systemctl daemon-reload
+systemctl start tomcat
+systemctl status tomcat
+
+
+firewall-cmd --permanent --add-port=8080/tcp
+firewall-cmd --reload
+dnf install git -y
+git clone https://github.com/networknuts/devops-project-java-app.git
+
+cd devops-project-java-app/
+
+cd  /root/devops-project-java-app/vprofile-project-vp-rem/src/main/resources
+
+
+ vim application.properities  
+##############################
+#JDBC Configutation for Database Connection
+jdbc.driverClassName=com.mysql.jdbc.Driver
+jdbc.url=jdbc:mysql://mysql:3306/accounts?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull
+jdbc.username=admin
+jdbc.password=redhat123
+
+#Memcached Configuration For Active and StandBy Host
+##For Active Host
+memcached.active.host=memcache
+memcached.active.port=11211
+#For StandBy Host
+memcached.standBy.host=127.0.0.2
+memcached.standBy.port=11211
+
+#RabbitMq Configuration
+rabbitmq.address=rabitmq.example.com
+rabbitmq.port=5672
+rabbitmq.username=test
+rabbitmq.password=test
+
+#Elasticesearch Configuration
+elasticsearch.host =192.168.1.85
+elasticsearch.port =9300
+elasticsearch.cluster=vprofile
+elasticsearch.node=vprofilenode
+##############################
+
+cd  /root/devops-project-java-app -->  mvn install (compile your update in configuration and create target file)
+
+systemctl stop tomcat
+ls -l /usr/local/tomcat/webapps/
+rm -rvf /usr/local/tomcat/webapps/ROOT*
+cp target/vprofile-v2.war /usr/local/tomcat/webapps/ROOT.war
+
+systemctl start tomcat
+systemctl status tomcat
+
+chown tomcat.tomcat /usr/local/tomcat/webapps/ -R
+systemctl restart tomcat.service 
+systemctl status tomcat.service
