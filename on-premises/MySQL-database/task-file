@@ -1,0 +1,24 @@
+
+yum install git mariadb-server -y
+systemctl start mariadb
+systemctl enable mariadb
+systemctl status mariadb
+mysql_secure_installation
+password-redhat123
+mysql -u root -predhat123
+create database accounts;
+
+grant all privileges on accounts.* TO 'admin'@'%' identified by 'redhat123';
+FLUSH PRIVILEGES; ----command in MySQL is used to reload the grant tables in memory
+exit
+
+------------------------------------------------------
+
+git clone https://github.com/networknuts/devops-project-java-app.git
+cd devops-project-java-app.git/vprofile-project-vp-rem
+mysql -u root -predhat123 accounts < src/main/resources/db_backup.sql mysql -u root -predhat123 accounts
+show tables
+exit
+systemctl restart mariadb.service
+firewall-cmd --permanent --add-port=3306/tcp
+firewall-cmd --reload
