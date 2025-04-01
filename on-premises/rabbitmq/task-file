@@ -1,0 +1,16 @@
+sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm  >>for epel repository 
+curl -s https://packagecloud.io/install/repositories/rabbitmq/rabbitmq-server/script.rpm.sh | sudo bash
+dnf install rabbitmq-server -y
+
+systemctl enable --now rabbitmq-server
+systemctl status rabbitmq-server.service 
+firewall-cmd --permanent --add-port=5672/tcp
+firewall-cmd --reload
+
+cd  /etc/rabbitmq/
+     vim rabbitmq.config >> [{rabbit,[{loopback_users,[]}]}].
+
+
+rabbitmqctl add_user test test         # ( test : username , test: password , and default guest {user and password} )
+rabbitmqctl set_user_tags test administrator    #(test is user which got admin priveleges)
+systemctl restart rabbitmq-server.service
