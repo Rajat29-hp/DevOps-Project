@@ -1,0 +1,20 @@
+dnf install memcached -y
+systemctl start memcached
+systemctl enable memcached.service
+vim /etc/sysconfig/memcached 
+systemctl restart memcached
+firewall-cmd --permanent --add-port=11211/tcp
+firewall-cmd --permanent --add-port=11111/udp
+firewall-cmd --reload
+
+
+memcached -p 11211 -U 11111 -u memcached -d
+
+------------------------------------------------------------
+
+# This command starts the Memcached server with specific configurations:
+
+# -p 11211 : Sets the TCP port to `11211`, which is the default port for Memcached.
+# -U 11111 : Sets the UDP port to `11111` for communication.
+# -u memcached : Specifies the user under which the Memcached process will run (in this case, `memcached`).
+# -d : Runs Memcached as a daemon process, meaning it will run in the background.
