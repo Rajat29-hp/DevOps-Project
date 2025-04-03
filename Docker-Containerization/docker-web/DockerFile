@@ -1,0 +1,4 @@
+FROM ngnix
+
+RUN rm -rv /etc/nginx/conf.d/default.config
+COPY nginxvproapp.conf /etc/nginx/conf.d/vproapp.conf
